@@ -1,0 +1,45 @@
+Description: Fix the use of the await keyword as def function
+Author: Thomas Goirand <zigo@debian.org>
+Forwarded: no
+Last-Update: 2018-10-29
+
+--- python-txaio-2.10.0.orig/test/test_gather.py
++++ python-txaio-2.10.0/test/test_gather.py
+@@ -26,7 +26,7 @@
+ 
+ import txaio
+ 
+-from util import await
++from util import await_
+ 
+ 
+ def test_gather_two(framework):
+@@ -61,7 +61,7 @@ def test_gather_two(framework):
+     txaio.add_callbacks(f2, done, error)
+ 
+     for f in [f0, f1, f2]:
+-        await(f)
++        await_(f)
+ 
+     assert len(results) == 1
+     assert len(errors) == 0
+@@ -99,7 +99,7 @@ def test_gather_no_consume(framework):
+     # out of "run_until_complete()" as well; fix util.py?
+     for f in [f0, f1, f2]:
+         try:
+-            await(f)
++            await_(f)
+         except Exception:
+             pass
+ 
+--- python-txaio-2.10.0.orig/test/util.py
++++ python-txaio-2.10.0/test/util.py
+@@ -57,7 +57,7 @@ def run_once():
+         asyncio.gather(*asyncio.Task.all_tasks())
+ 
+ 
+-def await(future):
++def await_(future):
+     '''
+     Essentially just a way to call "run_until_complete" that becomes a
+     no-op if we're using Twisted.
